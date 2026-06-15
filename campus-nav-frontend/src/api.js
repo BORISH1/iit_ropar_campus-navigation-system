@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3001/api';
+const API_URL = 'https://backend-final-green.vercel.app/api';
 
 function getHeaders() {
   const headers = { 'Content-Type': 'application/json' };
