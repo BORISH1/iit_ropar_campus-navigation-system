@@ -1,7 +1,8 @@
 import express from 'express';
+import { v4 as uuidv4 } from 'uuid';
 import { all, get, run } from './db.js';
 import { buildGraph, kShortestPaths, walkingMinutes } from './dijkstra.js';
-const uuid = require('uuid');
+
 const router = express.Router();
 
 // Dummy authentication middleware - replace with your actual JWT/Auth logic
