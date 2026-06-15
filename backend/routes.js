@@ -113,6 +113,29 @@ router.post('/edges', requireAuth, async (req, res) => {
   }
 });
 
+router.delete('/edges/:id', requireAuth, async (req, res) => {
+  try {
+    await run(`DELETE FROM edges WHERE id=$1`, [req.params.id]);
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.put('/edges/:id', requireAuth, async (req, res) => {
+  try {
+    const { from_id, to_id, distance, bidirectional, label } = req.body ?? {};
+    await run(
+      `UPDATE edges SET from_id=$1, to_id=$2, distance=$3, bidirectional=$4, label=$5 WHERE id=$6`,
+      [from_id, to_id, Number(distance), bidirectional, label ?? null, req.params.id]
+    );
+    const updated = await get(`SELECT * FROM edges WHERE id=$1`, [req.params.id]);
+    res.json(updated);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 router.get('/route', async (req, res) => {
   try {
     const { from, to, k = 3 } = req.query;
@@ -151,6 +174,15 @@ router.get('/stats', requireAuth, async (req, res) => {
     res.json({ locations: locCount, edges: edgeCount, typeBreakdown });
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+router.post('/auth/login', (req, res) => {
+  const { username, password } = req.body ?? {};
+  if (username === process.env.ADMIN_USER && password === process.env.ADMIN_PASS) {
+    res.json({ ok: true, token: 'admin-session' });
+  } else {
+    res.status(401).json({ error: 'Invalid credentials' });
   }
 });
 
